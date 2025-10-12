@@ -21,8 +21,8 @@ type NoteEditorProps = {
 
 function NoteEditor({ mutationFn, title, content }: NoteEditorProps) {
   const [note, setNote] = useState({
-    title: title || 'title',
-    content: content || '#Hello *World*',
+    title: title || '',
+    content: content || '',
   })
   const navigate = useNavigate()
 
@@ -72,6 +72,7 @@ function NoteEditor({ mutationFn, title, content }: NoteEditorProps) {
         </Button>
       </div>
       <MDXEditor
+        placeholder="Write something fun..."
         className="border rounded-md "
         markdown={note.content}
         onChange={(markdown) => {

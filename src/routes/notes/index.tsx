@@ -28,7 +28,6 @@ function PageNotes() {
 
   if (isPending) return <div>Loading ...</div>
   if (error) return <div>{error.message}</div>
-
   return (
     <div className="p-4 grid overflow-y-auto gap-y-4 grid-rows-[min-content_1fr]">
       <Card className="">
@@ -46,6 +45,11 @@ function PageNotes() {
 
       <Card>
         <CardContent>
+          {notes.length === 0 && (
+            <div className="flex justify-center items-center">
+              Empty Note Pad
+            </div>
+          )}
           <NoteList notes={notes} />
         </CardContent>
       </Card>

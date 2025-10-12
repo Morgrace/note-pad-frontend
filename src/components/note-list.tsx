@@ -1,12 +1,51 @@
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { Link } from '@tanstack/react-router'
 import { Pencil, Trash } from 'lucide-react'
 
 import { Button } from './ui/button'
 import type { AllNotes } from '@/types'
+import { deleteNote } from '@/lib/services/notes'
 
 type NoteListProps = { notes: AllNotes }
 
 function NoteList({ notes }: NoteListProps) {
+  const queryClient = useQueryClient()
+  const mutation = useMutation({
+    mutationFn: deleteNote,
+    async onMutate(deleteId) {
+      // Cancel outgoing refetches
+      await queryClient.cancelQueries({ queryKey: ['notes'] })
+
+      // Snapshot previous value
+      const previousNotes = queryClient.getQueryData(['notes'])
+
+      // Optimistically remove the note
+      queryClient.setQueryData(['notes'], (old) => {
+        if(!old?.data) return old
+        
+        const data: AllNotes = old.data
+        return {
+          ...old,
+          data: data.filter((note) => note.id !== deleteId),
+        }
+      })
+
+      // return previousNotes to use onError
+      return {
+        previousNotes,
+      }
+    },
+    onSettled() {
+      queryClient.invalidateQueries({
+        queryKey: ['notes'],
+      })
+    },
+    onError(error, deleteId, context) {
+      // Rollback on error
+      queryClient.setQueryData(['notes'], context?.previousNotes)
+      console.error(error.message)
+    },
+  })
   return (
     <ul className="space-y-2">
       {notes.map((note) => {
@@ -36,6 +75,8 @@ function NoteList({ notes }: NoteListProps) {
                 size="icon-sm"
                 variant="destructive"
                 className="cursor-pointer"
+                disabled={mutation.isPending}
+                onClick={() => mutation.mutate(note.id)}
               >
                 <Trash />
               </Button>
