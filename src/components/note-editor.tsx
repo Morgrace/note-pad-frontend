@@ -1,12 +1,13 @@
-import { MDXEditor, headingsPlugin } from '@mdxeditor/editor'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { Link, useNavigate } from '@tanstack/react-router'
-import { ChevronLeft } from 'lucide-react'
-import { useRef, useState } from 'react'
+import { ChevronLeft, LucideAsterisk } from 'lucide-react'
+import { useCallback, useRef, useState } from 'react'
+import NoteMarkupEditor from './note-markup-editor'
+
 import { Button } from './ui/button'
 import { Input } from './ui/input'
 
-import '@mdxeditor/editor/style.css'
+import type { MDXEditorMethods } from '@mdxeditor/editor'
 
 type NoteData = {
   title: string
@@ -20,13 +21,13 @@ type NoteEditorProps = {
 }
 
 function NoteEditor({ mutationFn, title, content }: NoteEditorProps) {
-  const [note, setNote] = useState({
-    title: title || '',
-    content: content || '',
-  })
-  const navigate = useNavigate()
+  const [noteTitle, setNoteTitle] = useState(title || '')
+  const [noteContent, setNoteContent] = useState(content || '')
+  const isFirstRender = useRef(true)
+  const editorRef = useRef<MDXEditorMethods>(null)
 
   const queryClient = useQueryClient()
+  const navigate = useNavigate()
 
   const mutation = useMutation({
     mutationFn: mutationFn,
@@ -43,50 +44,67 @@ function NoteEditor({ mutationFn, title, content }: NoteEditorProps) {
     },
   })
 
-  const isFirstRender = useRef(true)
-  return (
-    <div className="grid px-10 py-5 h-dvh grid-rows-[min-content_1fr] gap-2">
-      <div className="flex gap-2">
-        <Button asChild variant="link" size={'icon'}>
-          <Link to="..">
-            <ChevronLeft />
-          </Link>
-        </Button>
-        <Input
-          placeholder="Title"
-          value={note.title}
-          onChange={(e) =>
-            setNote((previousNote) => ({
-              ...previousNote,
-              title: e.target.value,
-            }))
-          }
-        />
+  const handleContentChange = useCallback((markdown: string) => {
+    if (isFirstRender.current) {
+      isFirstRender.current = false
+      return
+    }
+    setNoteContent(markdown)
+  }, [])
 
-        {/* Save Button */}
-        <Button
-          disabled={mutation.isPending}
-          onClick={() => mutation.mutate(note)}
-        >
-          {mutation.isPending ? 'Saving...' : 'Save'}
-        </Button>
+  const handleSaveNote = useCallback(() => {
+    const latestContent = editorRef.current?.getMarkdown() || noteContent
+    mutation.mutate({ title: noteTitle, content: latestContent })
+  }, [noteTitle, noteContent])
+
+  const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) =>
+    setNoteTitle(e.target.value)
+
+  return (
+    <div className="min-h-screen bg-slate-50">
+      <div className="max-w-5xl mx-auto px-6 py-8">
+        {/* Header Section */}
+        <div className="bg-white rounded-lg shadow-lg border border-slate-200 p-6 mb-6">
+          <div className="flex items-center gap-4 mb-4">
+            <Button
+              asChild
+              variant="ghost"
+              size="icon"
+              className="hover:bg-slate-100 hover:scale-110 transition-all"
+            >
+              <Link to="..">
+                <ChevronLeft className="h-6 w-6 text-slate-700" />
+              </Link>
+            </Button>
+            <div className="flex-1">
+              <Input
+                placeholder="Enter note title..."
+                value={noteTitle}
+                onChange={handleTitleChange}
+                name="noteTitle"
+                className="text-3xl font-bold border-none shadow-none focus-visible:ring-0 px-0 bg-transparent placeholder:text-slate-300"
+              />
+            </div>
+            <Button
+              disabled={mutation.isPending}
+              onClick={handleSaveNote}
+              className="bg-teal-500 hover:bg-teal-600 shadow-lg hover:shadow-xl transition-all hover:scale-105 text-white font-semibold px-8"
+            >
+              {mutation.isPending ? 'Saving...' : 'Save Note'}
+            </Button>
+          </div>
+          <div className="h-px bg-slate-200"></div>
+        </div>
+
+        {/* Editor Section */}
+        <div className="bg-white rounded-lg shadow-lg border border-slate-200 overflow-hidden">
+          <NoteMarkupEditor
+            ref={editorRef}
+            onContentChange={handleContentChange}
+            content={noteContent}
+          />
+        </div>
       </div>
-      <MDXEditor
-        placeholder="Write something fun..."
-        className="border rounded-md "
-        markdown={note.content}
-        onChange={(markdown) => {
-          if (isFirstRender.current) {
-            isFirstRender.current = false
-            return
-          }
-          setNote((previousNote) => ({
-            ...previousNote,
-            content: markdown,
-          }))
-        }}
-        plugins={[headingsPlugin()]}
-      />
     </div>
   )
 }

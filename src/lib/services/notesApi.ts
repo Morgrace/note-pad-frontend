@@ -1,17 +1,12 @@
 import axios from 'axios'
+import api from './axios'
 
-const BASE_URL = 'http://localhost:4000/api/v1/notes'
-
-const api = axios.create({
-  baseURL: BASE_URL,
-  headers: {
-    'Content-Type': 'application/json',
-  },
-})
+const BASE_URL = '/notes'
+const USER_URL = '/users/me/notes'
 
 export async function getNotes() {
   try {
-    const response = await api.get('/')
+    const response = await api.get(`${USER_URL}`)
     return response.data
   } catch (error: unknown) {
     if (axios.isAxiosError(error)) {
@@ -27,7 +22,7 @@ export async function getNotes() {
 
 export async function getNote(id: string) {
   try {
-    const response = await api.get(`/${id}`)
+    const response = await api.get(`${BASE_URL}/${id}`)
     return response.data
   } catch (error: unknown) {
     if (axios.isAxiosError(error)) {
@@ -43,7 +38,7 @@ export async function getNote(id: string) {
 
 export async function createNote(noteData: { title: string; content: string }) {
   try {
-    const response = await api.post('/create', noteData)
+    const response = await api.post(`${USER_URL}`, noteData)
     return response.data
   } catch (error: unknown) {
     if (axios.isAxiosError(error)) {
@@ -62,7 +57,7 @@ export async function updateNote(
   noteData: { title: string; content: string },
 ) {
   try {
-    const response = await api.patch(`/${id}`, noteData)
+    const response = await api.patch(`${BASE_URL}/${id}`, noteData)
     return response.data
   } catch (error: unknown) {
     if (axios.isAxiosError(error)) {
@@ -78,7 +73,7 @@ export async function updateNote(
 
 export async function deleteNote(id: string) {
   try {
-    const response = await api.delete(`/${id}`)
+    const response = await api.delete(`${BASE_URL}/${id}`)
     return response.data
   } catch (error: unknown) {
     if (axios.isAxiosError(error)) {
