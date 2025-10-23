@@ -25,7 +25,7 @@ import {
   UndoRedo,
 } from '@mdxeditor/editor'
 import '@mdxeditor/editor/style.css'
-import { memo, useCallback, useMemo, useRef } from 'react'
+import { memo, useCallback, useMemo } from 'react'
 
 function NoteMarkupEditor({
   ref,
@@ -60,7 +60,7 @@ function NoteMarkupEditor({
       markdownShortcutPlugin(),
       toolbarPlugin({
         toolbarContents: () => (
-          <div className="flex flex-wrap gap-2 p-3 bg-slate-50 border-b border-slate-200">
+          <div className="flex flex-wrap gap-1 sm:gap-2 p-2 sm:p-3 bg-slate-50 border-b border-slate-200 overflow-x-auto">
             <UndoRedo />
             <Separator />
             <BoldItalicUnderlineToggles />
@@ -92,7 +92,8 @@ function NoteMarkupEditor({
     <MDXEditor
       ref={ref}
       placeholder="Start writing your note..."
-      className="prose prose-lg max-w-none min-h-[600px] px-8 py-6"
+      className="min-h-[350px] sm:min-h-[500px] md:min-h-[600px] px-3 sm:px-5 md:px-8 py-4 sm:py-5 md:py-6"
+      contentEditableClassName="prose prose-sm sm:prose-base md:prose-lg max-w-none"
       onBlur={handleBlur}
       markdown={content || ''}
       plugins={plugins}

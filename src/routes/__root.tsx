@@ -7,6 +7,7 @@ import {
 import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
 import { useEffect } from 'react'
 
+import { Toaster } from 'sonner'
 import TanStackQueryDevtools from '../integrations/tanstack-query/devtools'
 import NotFound from '../components/not-found'
 import ErrorPage from '../components/error-page'
@@ -33,7 +34,12 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
         content: 'width=device-width, initial-scale=1',
       },
       {
-        title: 'My Note Pad',
+        title: 'Write-it-down - Professional Note-Taking for Developers',
+      },
+      {
+        name: 'description',
+        content:
+          'A powerful markdown editor designed for professionals. Organize your thoughts, code snippets, and documentation with ease.',
       },
     ],
     links: [
@@ -64,9 +70,10 @@ function RootDocument({ children }: { children: React.ReactNode }) {
       <head>
         <HeadContent />
       </head>
-      <body className="h-dvh">
+      <body>
         <Navbar />
         {children}
+        <Toaster />
         <TanStackDevtools
           config={{
             position: 'bottom-left',

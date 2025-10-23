@@ -1,10 +1,12 @@
 import { useQuery } from '@tanstack/react-query'
 import { Link, createFileRoute } from '@tanstack/react-router'
-import { Plus, Search, Filter, SlidersHorizontal } from 'lucide-react'
+import { Plus, Search, SlidersHorizontal } from 'lucide-react'
 import { useState } from 'react'
 
 import type { AllNotes } from '@/types'
 
+import ErrorAllNotes from '@/components/error-all-notes'
+import LoaderAllNotes from '@/components/loader-all-notes'
 import NoteList from '@/components/note-list'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
@@ -25,8 +27,8 @@ function PageNotes() {
     queryFn: getNotes,
     staleTime: 3600,
   })
+
   const notes: AllNotes = data?.data.notes || []
-  console.log(notes)
 
   // Filter and sort notes
   const filteredNotes = notes
@@ -35,67 +37,34 @@ function PageNotes() {
     )
     .sort((a, b) => {
       if (sortBy === 'date') {
-        return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        return new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
       }
       return (a.title || '').localeCompare(b.title || '')
     })
 
-  if (isPending)
-    return (
-      <div className="flex h-screen items-center justify-center bg-slate-50">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-16 w-16 border-4 border-slate-200 border-t-teal-500 mx-auto mb-4"></div>
-          <p className="text-slate-700 font-medium">Loading your notes...</p>
-        </div>
-      </div>
-    )
+  if (isPending) return <LoaderAllNotes />
 
-  if (error)
-    return (
-      <div className="flex h-screen items-center justify-center bg-slate-50">
-        <div className="text-center bg-white rounded-lg shadow-xl p-8 max-w-md border border-slate-200">
-          <div className="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-4">
-            <svg
-              className="w-8 h-8 text-red-600"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M6 18L18 6M6 6l12 12"
-              />
-            </svg>
-          </div>
-          <p className="text-2xl font-bold text-red-600 mb-2">
-            Error loading notes
-          </p>
-          <p className="text-slate-600">{error.message}</p>
-        </div>
-      </div>
-    )
+  if (error) return <ErrorAllNotes error={error} />
 
   return (
-    <div className="min-h-screen bg-slate-50 p-6">
+    <div className="min-h-screen bg-slate-50 p-3 sm:p-4 md:p-6">
       <div className="max-w-5xl mx-auto">
         {/* Header Section */}
-        <div className="mb-8">
-          <div className="flex items-center justify-between">
+        <div className="mb-6 sm:mb-8">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div>
-              <h1 className="text-5xl font-bold text-slate-900">My Notes</h1>
-              <p className="text-slate-600 mt-3 text-lg font-medium">
+              <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-slate-900">My Notes</h1>
+              <p className="text-slate-600 mt-2 sm:mt-3 text-base sm:text-lg font-medium">
                 {notes.length} {notes.length === 1 ? 'note' : 'notes'} in total
               </p>
             </div>
             <Button
               asChild
               size="default"
-              className="bg-teal-500 hover:bg-teal-600 shadow-lg hover:shadow-xl transition-all hover:scale-105 text-white font-semibold"
+              className="bg-teal-500 hover:bg-teal-600 shadow-lg hover:shadow-xl transition-all hover:scale-105 text-white font-semibold w-full sm:w-auto"
             >
               <Link to="/notes/new">
-                <Plus className="mr-2 h-5 w-5" />
+                <Plus className="mr-2 h-4 w-4 sm:h-5 sm:w-5" />
                 New Note
               </Link>
             </Button>
@@ -104,31 +73,31 @@ function PageNotes() {
 
         {/* Search and Filter Bar */}
         {notes.length > 0 && (
-          <div className="mb-6 space-y-4">
-            <div className="flex gap-3 items-center">
+          <div className="mb-4 sm:mb-6 space-y-3 sm:space-y-4">
+            <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 items-stretch sm:items-center">
               {/* Search Bar */}
               <div className="flex-1 relative">
-                <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" />
+                <Search className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 h-4 w-4 sm:h-5 sm:w-5 text-slate-400" />
                 <Input
                   type="text"
                   placeholder="Search notes by title..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-12 pr-4 py-6 text-base border border-slate-300 focus:border-teal-500 focus:ring-teal-500 bg-white rounded-lg shadow-sm"
+                  className="pl-10 sm:pl-12 pr-3 sm:pr-4 py-5 sm:py-6 text-sm sm:text-base border border-slate-300 focus:border-teal-500 focus:ring-teal-500 bg-white rounded-lg shadow-sm"
                 />
               </div>
 
               {/* Filter Button */}
               <Button
                 onClick={() => setFilterOpen(!filterOpen)}
-                className={`px-6 ${
+                className={`px-4 sm:px-6 ${
                   filterOpen
                     ? 'bg-teal-500 text-white hover:bg-teal-600'
                     : 'bg-white text-slate-700 border border-slate-300 hover:bg-slate-50'
                 } shadow-sm rounded-lg transition-all`}
               >
-                <SlidersHorizontal className="h-5 w-5 mr-2" />
-                Filters
+                <SlidersHorizontal className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
+                <span className="text-sm sm:text-base">Filters</span>
               </Button>
             </div>
 
@@ -165,6 +134,7 @@ function PageNotes() {
                       Title
                     </Button>
                   </div>
+
                   {/* Future filter options can go here */}
                   <span className="ml-auto text-xs text-slate-500 italic">
                     More filters coming soon...
@@ -178,15 +148,15 @@ function PageNotes() {
         {/* Notes Content */}
         {notes.length === 0 ? (
           <Card className="shadow-lg border border-slate-200 bg-white">
-            <CardContent className="py-16">
+            <CardContent className="py-12 sm:py-16">
               <div className="text-center">
-                <div className="mx-auto w-28 h-28 bg-teal-50 rounded-full flex items-center justify-center mb-6 shadow-md">
-                  <Plus className="h-14 w-14 text-teal-500" />
+                <div className="mx-auto w-20 h-20 sm:w-28 sm:h-28 bg-teal-50 rounded-full flex items-center justify-center mb-4 sm:mb-6 shadow-md">
+                  <Plus className="h-10 w-10 sm:h-14 sm:w-14 text-teal-500" />
                 </div>
-                <h3 className="text-2xl font-bold text-slate-900 mb-3">
+                <h3 className="text-xl sm:text-2xl font-bold text-slate-900 mb-2 sm:mb-3">
                   No notes yet
                 </h3>
-                <p className="text-slate-600 mb-8 text-lg">
+                <p className="text-slate-600 mb-6 sm:mb-8 text-base sm:text-lg px-4">
                   Get started by creating your first note
                 </p>
                 <Button
@@ -203,15 +173,15 @@ function PageNotes() {
           </Card>
         ) : filteredNotes.length === 0 ? (
           <Card className="shadow-lg border border-slate-200 bg-white">
-            <CardContent className="py-16">
+            <CardContent className="py-12 sm:py-16">
               <div className="text-center">
-                <div className="mx-auto w-28 h-28 bg-slate-100 rounded-full flex items-center justify-center mb-6 shadow-md">
-                  <Search className="h-14 w-14 text-slate-400" />
+                <div className="mx-auto w-20 h-20 sm:w-28 sm:h-28 bg-slate-100 rounded-full flex items-center justify-center mb-4 sm:mb-6 shadow-md">
+                  <Search className="h-10 w-10 sm:h-14 sm:w-14 text-slate-400" />
                 </div>
-                <h3 className="text-2xl font-bold text-slate-900 mb-3">
+                <h3 className="text-xl sm:text-2xl font-bold text-slate-900 mb-2 sm:mb-3">
                   No notes found
                 </h3>
-                <p className="text-slate-600 mb-4 text-lg">
+                <p className="text-slate-600 mb-4 text-base sm:text-lg px-4">
                   Try adjusting your search or filters
                 </p>
                 <Button

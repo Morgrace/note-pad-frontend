@@ -42,13 +42,13 @@ function Signup() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center p-4 bg-slate-50">
-      <Card className="w-full max-w-md p-8 shadow-xl border border-slate-200 bg-white">
-        <div className="mb-8 text-center">
-          <h1 className="text-3xl font-bold text-slate-900">
+    <div className="flex min-h-screen items-center justify-center p-3 sm:p-4 md:p-6 bg-slate-50">
+      <Card className="w-full max-w-md p-5 sm:p-6 md:p-8 shadow-xl border border-slate-200 bg-white">
+        <div className="mb-6 sm:mb-8 text-center">
+          <h1 className="text-2xl sm:text-3xl font-bold text-slate-900">
             Create Account
           </h1>
-          <p className="mt-2 text-slate-600 font-medium">
+          <p className="mt-1.5 sm:mt-2 text-sm sm:text-base text-slate-600 font-medium">
             Get started with your free account
           </p>
         </div>

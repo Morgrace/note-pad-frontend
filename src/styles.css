@@ -11,6 +11,7 @@ body {
     'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  font-size: clamp(14px, 1vw + 12px, 16px);
 }
 
 code {
@@ -135,4 +136,170 @@ code {
   body {
     @apply bg-background text-foreground;
   }
+}
+
+/* MDXEditor content styles - lists, typography */
+.prose {
+  color: inherit;
+  max-width: none;
+}
+
+.prose ul {
+  list-style-type: disc !important;
+  padding-left: 1.5em !important;
+  margin: 1em 0 !important;
+  display: block !important;
+}
+
+.prose ol {
+  list-style-type: decimal !important;
+  padding-left: 1.5em !important;
+  margin: 1em 0 !important;
+  display: block !important;
+}
+
+.prose li {
+  margin: 0.5em 0 !important;
+  display: list-item !important;
+}
+
+.prose ul ul {
+  list-style-type: circle;
+  margin: 0.5em 0;
+}
+
+.prose ol ol {
+  list-style-type: lower-alpha;
+  margin: 0.5em 0;
+}
+
+.prose h1 {
+  font-size: 2.25em;
+  font-weight: 800;
+  margin: 0.8em 0 0.5em;
+  line-height: 1.1;
+}
+
+.prose h2 {
+  font-size: 1.875em;
+  font-weight: 700;
+  margin: 0.8em 0 0.5em;
+  line-height: 1.2;
+}
+
+.prose h3 {
+  font-size: 1.5em;
+  font-weight: 600;
+  margin: 0.8em 0 0.5em;
+  line-height: 1.3;
+}
+
+.prose p {
+  margin: 1em 0;
+  line-height: 1.75;
+}
+
+.prose a {
+  color: #0ea5e9;
+  text-decoration: underline;
+}
+
+.prose a:hover {
+  color: #0284c7;
+}
+
+.prose blockquote {
+  border-left: 4px solid #e2e8f0;
+  padding-left: 1em;
+  margin: 1em 0;
+  font-style: italic;
+  color: #64748b;
+}
+
+.prose code {
+  background-color: #f1f5f9;
+  padding: 0.2em 0.4em;
+  border-radius: 0.25em;
+  font-size: 0.875em;
+  font-family: 'Courier New', monospace;
+}
+
+.prose pre {
+  background-color: #1e293b;
+  color: #e2e8f0;
+  padding: 1em;
+  border-radius: 0.5em;
+  overflow-x: auto;
+  margin: 1em 0;
+}
+
+.prose pre code {
+  background-color: transparent;
+  padding: 0;
+  color: inherit;
+}
+
+.prose table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 1em 0;
+}
+
+.prose table th,
+.prose table td {
+  border: 1px solid #e2e8f0;
+  padding: 0.5em 1em;
+  text-align: left;
+}
+
+.prose table th {
+  background-color: #f8fafc;
+  font-weight: 600;
+}
+
+.prose hr {
+  border: none;
+  border-top: 2px solid #e2e8f0;
+  margin: 2em 0;
+}
+
+/* Responsive Typography System */
+.text-responsive-xs {
+  font-size: clamp(0.75rem, 0.5vw + 0.65rem, 0.875rem);
+}
+
+.text-responsive-sm {
+  font-size: clamp(0.875rem, 0.5vw + 0.75rem, 1rem);
+}
+
+.text-responsive-base {
+  font-size: clamp(1rem, 0.75vw + 0.85rem, 1.125rem);
+}
+
+.text-responsive-lg {
+  font-size: clamp(1.125rem, 1vw + 0.95rem, 1.25rem);
+}
+
+.text-responsive-xl {
+  font-size: clamp(1.25rem, 1.25vw + 1rem, 1.5rem);
+}
+
+.text-responsive-2xl {
+  font-size: clamp(1.5rem, 1.5vw + 1.25rem, 2rem);
+}
+
+.text-responsive-3xl {
+  font-size: clamp(1.875rem, 2vw + 1.5rem, 2.5rem);
+}
+
+.text-responsive-4xl {
+  font-size: clamp(2.25rem, 2.5vw + 1.75rem, 3rem);
+}
+
+.text-responsive-5xl {
+  font-size: clamp(2.5rem, 3vw + 2rem, 4rem);
+}
+
+.mdxeditor-popup-container {
+  display: none !important;
 }
