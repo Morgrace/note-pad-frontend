@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card } from '@/components/ui/card'
 
-export const Route = createFileRoute('/(auth)/forgot-password')({
+export const Route = createFileRoute('/_auth/forgot-password')({
   component: ForgotPassword,
 })
 

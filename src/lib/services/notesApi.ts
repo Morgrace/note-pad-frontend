@@ -1,4 +1,4 @@
-import axios from 'axios'
+import { formatAxiosError } from '../utils'
 import api from './axios'
 
 const BASE_URL = '/notes'
@@ -9,14 +9,8 @@ export async function getNotes() {
     const response = await api.get(`${USER_URL}`)
     return response.data
   } catch (error: unknown) {
-    if (axios.isAxiosError(error)) {
-      const status = error.response?.status
-      const message = error.response?.data?.message || error.message
-      throw new Error(
-        `Request failed: ${status ? `(status: ${status})` : ''}: ${message}`,
-      )
-    }
-    throw new Error('An unknown error occurred while fetching notes')
+    const { message } = formatAxiosError(error)
+    throw new Error(message)
   }
 }
 
@@ -25,14 +19,8 @@ export async function getNote(id: string) {
     const response = await api.get(`${BASE_URL}/${id}`)
     return response.data
   } catch (error: unknown) {
-    if (axios.isAxiosError(error)) {
-      const status = error.response?.status
-      const message = error.response?.data?.message || error.message
-      throw new Error(
-        `Request failed: ${status ? `(status: ${status})` : ''}: ${message}`,
-      )
-    }
-    throw new Error('An unknown error occurred while fetching notes')
+    const { message } = formatAxiosError(error)
+    throw new Error(message)
   }
 }
 
@@ -41,14 +29,8 @@ export async function createNote(noteData: { title: string; content: string }) {
     const response = await api.post(`${USER_URL}`, noteData)
     return response.data
   } catch (error: unknown) {
-    if (axios.isAxiosError(error)) {
-      const status = error.response?.status
-      const message = error.response?.data?.message || error.message
-      throw new Error(
-        `Request failed: ${status ? `(status: ${status})` : ''}: ${message}`,
-      )
-    }
-    throw new Error('An unknown error occurred while creating notes')
+    const { message } = formatAxiosError(error)
+    throw new Error(message)
   }
 }
 
@@ -60,14 +42,8 @@ export async function updateNote(
     const response = await api.patch(`${BASE_URL}/${id}`, noteData)
     return response.data
   } catch (error: unknown) {
-    if (axios.isAxiosError(error)) {
-      const status = error.response?.status
-      const message = error.response?.data?.message || error.message
-      throw new Error(
-        `Request failed: ${status ? `(status: ${status})` : ''}: ${message}`,
-      )
-    }
-    throw new Error('An unknown error occurred while creating notes')
+    const { message } = formatAxiosError(error)
+    throw new Error(message)
   }
 }
 
@@ -76,13 +52,7 @@ export async function deleteNote(id: string) {
     const response = await api.delete(`${BASE_URL}/${id}`)
     return response.data
   } catch (error: unknown) {
-    if (axios.isAxiosError(error)) {
-      const status = error.response?.status
-      const message = error.response?.data?.message || error.message
-      throw new Error(
-        `Request failed: ${status ? `(status: ${status})` : ''}: ${message}`,
-      )
-    }
-    throw new Error('An unknown error occurred while deleting notes')
+    const { message } = formatAxiosError(error)
+    throw new Error(message)
   }
 }

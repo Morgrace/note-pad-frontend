@@ -303,3 +303,16 @@ code {
 .mdxeditor-popup-container {
   display: none !important;
 }
+
+.animate-fade-in {
+  animation: fade-in 0.2s ease-in;
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}

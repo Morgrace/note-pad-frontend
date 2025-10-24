@@ -1,53 +1,42 @@
-import {
-  createFileRoute,
-  Link,
-  useNavigate,
-  useSearch,
-} from '@tanstack/react-router'
+import { createFileRoute, Link } from '@tanstack/react-router'
+import { useState } from 'react'
 import { Github } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card } from '@/components/ui/card'
-import { useAuthStore } from '@/store/auth'
 
-export const Route = createFileRoute('/(auth)/login')({
-  component: Login,
+export const Route = createFileRoute('/_auth/signup')({
+  component: Signup,
 })
 
-function Login() {
-  const navigate = useNavigate()
-  const search = useSearch({ from: '/(auth)/login' })
+function Signup() {
+  const [error, setError] = useState('')
 
-  const login = useAuthStore((state) => state.login)
-  const isLoading = useAuthStore((state) => state.isLoading)
-
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
+    setError('')
 
     const formData = new FormData(e.currentTarget)
-
+    const name = formData.get('name')
     const email = formData.get('email')
     const password = formData.get('password')
+    const passwordConfirm = formData.get('passwordConfirm')
 
-    try {
-      await login(email as string, password as string)
-
-      const redirectTo = (search as any)?.redirect
-
-      navigate({ to: redirectTo })
-    } catch (error) {
-      console.error('login failed', error)
-
-      alert('login failed')
+    if (password !== passwordConfirm) {
+      setError('Passwords do not match')
+      return
     }
+
+    // TODO: Implement signup logic
+    console.log('Signup attempt:', { name, email, password })
   }
 
-  const handleGoogleLogin = () => {
+  const handleGoogleSignup = () => {
     // TODO: Implement Google OAuth
     window.location.href = '/api/auth/google'
   }
 
-  const handleGithubLogin = () => {
+  const handleGithubSignup = () => {
     // TODO: Implement GitHub OAuth
     window.location.href = '/api/auth/github'
   }
@@ -56,18 +45,31 @@ function Login() {
     <div className="flex min-h-screen items-center justify-center p-3 sm:p-4 md:p-6 bg-slate-50">
       <Card className="w-full max-w-md p-5 sm:p-6 md:p-8 shadow-xl border border-slate-200 bg-white">
         <div className="mb-6 sm:mb-8 text-center">
-          <h1 className="text-2xl sm:text-3xl font-bold text-slate-900">Welcome Back</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold text-slate-900">
+            Create Account
+          </h1>
           <p className="mt-1.5 sm:mt-2 text-sm sm:text-base text-slate-600 font-medium">
-            Sign in to your account
+            Get started with your free account
           </p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label
-              htmlFor="email"
-              className="block text-sm font-semibold mb-2 text-slate-700"
-            >
+            <label htmlFor="name" className="block text-sm font-semibold mb-2 text-slate-700">
+              Name
+            </label>
+            <Input
+              id="name"
+              name="name"
+              type="text"
+              placeholder="John Doe"
+              required
+              className="border-slate-300 focus:border-teal-500 focus:ring-teal-500"
+            />
+          </div>
+
+          <div>
+            <label htmlFor="email" className="block text-sm font-semibold mb-2 text-slate-700">
               Email
             </label>
             <Input
@@ -81,36 +83,49 @@ function Login() {
           </div>
 
           <div>
-            <div className="flex items-center justify-between mb-2">
-              <label
-                htmlFor="password"
-                className="block text-sm font-semibold text-slate-700"
-              >
-                Password
-              </label>
-              <Link
-                to="/forgot-password"
-                className="text-sm font-semibold text-teal-600 hover:text-teal-700 hover:underline"
-              >
-                Forgot Password?
-              </Link>
-            </div>
+            <label
+              htmlFor="password"
+              className="block text-sm font-semibold mb-2 text-slate-700"
+            >
+              Password
+            </label>
             <Input
               id="password"
               name="password"
               type="password"
               placeholder="••••••••"
               required
+              minLength={8}
               className="border-slate-300 focus:border-teal-500 focus:ring-teal-500"
             />
           </div>
 
-          <Button
-            disabled={isLoading}
-            type="submit"
-            className="w-full bg-teal-500 hover:bg-teal-600 shadow-lg hover:shadow-xl transition-all hover:scale-105 text-white font-semibold"
-          >
-            {isLoading ? 'Signing in . . .' : 'Sign in'}
+          <div>
+            <label
+              htmlFor="passwordConfirm"
+              className="block text-sm font-semibold mb-2 text-slate-700"
+            >
+              Confirm Password
+            </label>
+            <Input
+              id="passwordConfirm"
+              name="passwordConfirm"
+              type="password"
+              placeholder="••••••••"
+              required
+              minLength={8}
+              className="border-slate-300 focus:border-teal-500 focus:ring-teal-500"
+            />
+          </div>
+
+          {error && (
+            <div className="bg-red-50 border border-red-200 rounded-lg p-3">
+              <p className="text-sm text-red-600 font-medium">{error}</p>
+            </div>
+          )}
+
+          <Button type="submit" className="w-full bg-teal-500 hover:bg-teal-600 shadow-lg hover:shadow-xl transition-all hover:scale-105 text-white font-semibold">
+            Sign Up
           </Button>
         </form>
 
@@ -125,7 +140,7 @@ function Login() {
             type="button"
             variant="outline"
             className="w-full border border-slate-300 hover:bg-slate-50 hover:border-slate-400 transition-all"
-            onClick={handleGoogleLogin}
+            onClick={handleGoogleSignup}
           >
             <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24">
               <path
@@ -152,7 +167,7 @@ function Login() {
             type="button"
             variant="outline"
             className="w-full border border-slate-300 hover:bg-slate-50 hover:border-slate-400 transition-all"
-            onClick={handleGithubLogin}
+            onClick={handleGithubSignup}
           >
             <Github className="mr-2 h-4 w-4" />
             Continue with GitHub
@@ -160,12 +175,12 @@ function Login() {
         </div>
 
         <p className="mt-6 text-center text-sm text-slate-700">
-          Don't have an account?{' '}
+          Already have an account?{' '}
           <Link
-            to="/signup"
+            to="/login"
             className="font-semibold text-teal-600 hover:text-teal-700 hover:underline"
           >
-            Sign up
+            Sign in
           </Link>
         </p>
       </Card>

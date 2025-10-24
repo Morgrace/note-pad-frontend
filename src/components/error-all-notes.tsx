@@ -1,6 +1,6 @@
 function ErrorAllNotes({ error }: { error: Error }) {
   return (
-    <div className="flex h-screen items-center justify-center bg-slate-50">
+    <div className="flex min-h-[80dvh] items-center justify-center bg-slate-50">
       <div className="text-center bg-white rounded-lg shadow-xl p-8 max-w-md border border-slate-200">
         <div className="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-4">
           <svg

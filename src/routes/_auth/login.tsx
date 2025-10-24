@@ -1,75 +1,79 @@
-import { createFileRoute, Link } from '@tanstack/react-router'
-import { useState } from 'react'
+import {
+  createFileRoute,
+  Link,
+  useNavigate,
+  useSearch,
+} from '@tanstack/react-router'
+import { toast } from 'sonner'
 import { Github } from 'lucide-react'
+
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card } from '@/components/ui/card'
+import { useAuthStore } from '@/store/auth'
 
-export const Route = createFileRoute('/(auth)/signup')({
-  component: Signup,
+export const Route = createFileRoute('/_auth/login')({
+  component: Login,
 })
 
-function Signup() {
-  const [error, setError] = useState('')
+function Login() {
+  const navigate = useNavigate()
+  const search = useSearch({ from: '/_auth/login' })
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const login = useAuthStore((state) => state.login)
+  const isLoading = useAuthStore((state) => state.isLoading)
+  const error = useAuthStore((state) => state.error)
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    setError('')
 
     const formData = new FormData(e.currentTarget)
-    const name = formData.get('name')
+
     const email = formData.get('email')
     const password = formData.get('password')
-    const passwordConfirm = formData.get('passwordConfirm')
 
-    if (password !== passwordConfirm) {
-      setError('Passwords do not match')
-      return
+    try {
+      await login(email as string, password as string)
+
+      const redirectTo = (search as any)?.redirect || '/notes'
+
+      navigate({ to: redirectTo })
+    } catch (error) {
+      console.error('login failed', error)
+
+      toast.error('login failed')
     }
-
-    // TODO: Implement signup logic
-    console.log('Signup attempt:', { name, email, password })
   }
 
-  const handleGoogleSignup = () => {
+  const handleGoogleLogin = () => {
     // TODO: Implement Google OAuth
     window.location.href = '/api/auth/google'
   }
 
-  const handleGithubSignup = () => {
+  const handleGithubLogin = () => {
     // TODO: Implement GitHub OAuth
     window.location.href = '/api/auth/github'
   }
-
   return (
     <div className="flex min-h-screen items-center justify-center p-3 sm:p-4 md:p-6 bg-slate-50">
       <Card className="w-full max-w-md p-5 sm:p-6 md:p-8 shadow-xl border border-slate-200 bg-white">
         <div className="mb-6 sm:mb-8 text-center">
           <h1 className="text-2xl sm:text-3xl font-bold text-slate-900">
-            Create Account
+            Welcome Back
           </h1>
           <p className="mt-1.5 sm:mt-2 text-sm sm:text-base text-slate-600 font-medium">
-            Get started with your free account
+            Sign in to your account
           </p>
         </div>
 
+        <div className="text-red-600 text-sm">{error?.message || ''}</div>
+
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label htmlFor="name" className="block text-sm font-semibold mb-2 text-slate-700">
-              Name
-            </label>
-            <Input
-              id="name"
-              name="name"
-              type="text"
-              placeholder="John Doe"
-              required
-              className="border-slate-300 focus:border-teal-500 focus:ring-teal-500"
-            />
-          </div>
-
-          <div>
-            <label htmlFor="email" className="block text-sm font-semibold mb-2 text-slate-700">
+            <label
+              htmlFor="email"
+              className="block text-sm font-semibold mb-2 text-slate-700"
+            >
               Email
             </label>
             <Input
@@ -83,49 +87,36 @@ function Signup() {
           </div>
 
           <div>
-            <label
-              htmlFor="password"
-              className="block text-sm font-semibold mb-2 text-slate-700"
-            >
-              Password
-            </label>
+            <div className="flex items-center justify-between mb-2">
+              <label
+                htmlFor="password"
+                className="block text-sm font-semibold text-slate-700"
+              >
+                Password
+              </label>
+              <Link
+                to="/forgot-password"
+                className="text-sm font-semibold text-teal-600 hover:text-teal-700 hover:underline"
+              >
+                Forgot Password?
+              </Link>
+            </div>
             <Input
               id="password"
               name="password"
               type="password"
               placeholder="••••••••"
               required
-              minLength={8}
               className="border-slate-300 focus:border-teal-500 focus:ring-teal-500"
             />
           </div>
 
-          <div>
-            <label
-              htmlFor="passwordConfirm"
-              className="block text-sm font-semibold mb-2 text-slate-700"
-            >
-              Confirm Password
-            </label>
-            <Input
-              id="passwordConfirm"
-              name="passwordConfirm"
-              type="password"
-              placeholder="••••••••"
-              required
-              minLength={8}
-              className="border-slate-300 focus:border-teal-500 focus:ring-teal-500"
-            />
-          </div>
-
-          {error && (
-            <div className="bg-red-50 border border-red-200 rounded-lg p-3">
-              <p className="text-sm text-red-600 font-medium">{error}</p>
-            </div>
-          )}
-
-          <Button type="submit" className="w-full bg-teal-500 hover:bg-teal-600 shadow-lg hover:shadow-xl transition-all hover:scale-105 text-white font-semibold">
-            Sign Up
+          <Button
+            disabled={isLoading}
+            type="submit"
+            className="w-full bg-teal-500 hover:bg-teal-600 shadow-lg hover:shadow-xl transition-all hover:scale-105 text-white font-semibold "
+          >
+            {isLoading ? 'Signing in . . .' : 'Sign in'}
           </Button>
         </form>
 
@@ -137,10 +128,11 @@ function Signup() {
 
         <div className="space-y-3">
           <Button
+            disabled
             type="button"
             variant="outline"
             className="w-full border border-slate-300 hover:bg-slate-50 hover:border-slate-400 transition-all"
-            onClick={handleGoogleSignup}
+            onClick={handleGoogleLogin}
           >
             <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24">
               <path
@@ -164,10 +156,11 @@ function Signup() {
           </Button>
 
           <Button
+            disabled
             type="button"
             variant="outline"
             className="w-full border border-slate-300 hover:bg-slate-50 hover:border-slate-400 transition-all"
-            onClick={handleGithubSignup}
+            onClick={handleGithubLogin}
           >
             <Github className="mr-2 h-4 w-4" />
             Continue with GitHub
@@ -175,12 +168,12 @@ function Signup() {
         </div>
 
         <p className="mt-6 text-center text-sm text-slate-700">
-          Already have an account?{' '}
+          Don't have an account?{' '}
           <Link
-            to="/login"
+            to="/signup"
             className="font-semibold text-teal-600 hover:text-teal-700 hover:underline"
           >
-            Sign in
+            Sign up
           </Link>
         </p>
       </Card>

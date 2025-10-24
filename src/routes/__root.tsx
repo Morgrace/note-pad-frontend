@@ -5,19 +5,20 @@ import {
   createRootRouteWithContext,
 } from '@tanstack/react-router'
 import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 
 import { Toaster } from 'sonner'
-import TanStackQueryDevtools from '../integrations/tanstack-query/devtools'
-import NotFound from '../components/not-found'
 import ErrorPage from '../components/error-page'
 import Navbar from '../components/navbar'
+import NotFound from '../components/not-found'
+import TanStackQueryDevtools from '../integrations/tanstack-query/devtools'
 
 import appCss from '../styles.css?url'
 
 import type { QueryClient } from '@tanstack/react-query'
 
 import { useAuthStore } from '@/store/auth'
+import { SplashScreen } from '@/components/splash-screen'
 
 interface MyRouterContext {
   queryClient: QueryClient
@@ -60,11 +61,32 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
 })
 
 function RootDocument({ children }: { children: React.ReactNode }) {
+  const [showSplashScreen, setShowSplashScreen] = useState(true)
   const verifyAuth = useAuthStore((state) => state.verifyAuth)
 
   useEffect(() => {
     verifyAuth()
   }, [])
+
+  useEffect(() => {
+    setTimeout(() => {
+      setShowSplashScreen(false)
+    }, 3000)
+  }, [])
+
+  if (showSplashScreen) {
+    return (
+      <html lang="en">
+        <head>
+          <HeadContent />
+        </head>
+        <body>
+          <SplashScreen />
+          <Scripts />
+        </body>
+      </html>
+    )
+  }
   return (
     <html lang="en">
       <head>

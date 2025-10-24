@@ -25,7 +25,6 @@ function PageNotes() {
   const { isPending, error, data } = useQuery({
     queryKey: ['notes'],
     queryFn: getNotes,
-    staleTime: 3600,
   })
 
   const notes: AllNotes = data?.data.notes || []
@@ -53,7 +52,9 @@ function PageNotes() {
         <div className="mb-6 sm:mb-8">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div>
-              <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-slate-900">My Notes</h1>
+              <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-slate-900">
+                My Notes
+              </h1>
               <p className="text-slate-600 mt-2 sm:mt-3 text-base sm:text-lg font-medium">
                 {notes.length} {notes.length === 1 ? 'note' : 'notes'} in total
               </p>
