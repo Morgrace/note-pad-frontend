@@ -1,1 +1,0 @@
-import{j as t,F as o}from"./main-DBOsu65v.js";import{N as e}from"./note-editor-7tXAQl2_.js";import"./useMutation-BPewJrC-.js";import"./input-B4C8V-72.js";function s(){return t.jsx("section",{children:t.jsx(e,{mutationFn:o})})}export{s as component};
