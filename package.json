@@ -20,6 +20,7 @@
     "@radix-ui/react-slot": "^1.2.3",
     "@tailwindcss/typography": "^0.5.19",
     "@tailwindcss/vite": "^4.0.6",
+    "@tanstack/history": "^1.133.28",
     "@tanstack/react-devtools": "^0.7.0",
     "@tanstack/react-query": "^5.66.5",
     "@tanstack/react-query-devtools": "^5.84.2",
