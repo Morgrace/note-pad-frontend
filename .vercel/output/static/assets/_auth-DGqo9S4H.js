@@ -1,0 +1,1 @@
+import{a as o,u as s,r as u,j as a,O as i}from"./main-DBOsu65v.js";function f(){const r=o(),e=s(t=>t.user),n=s(t=>t.isLoading);return u.useEffect(()=>{e&&r({to:"/",replace:!0})},[n,e]),a.jsx("div",{className:"animate-fade-in",children:a.jsx(i,{})})}export{f as component};
