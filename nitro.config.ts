@@ -2,4 +2,7 @@ import { defineNitroConfig } from 'nitropack/config'
 
 export default defineNitroConfig({
   preset: 'vercel',
+  moduleSideEffects: [
+    '@tanstack/history',
+  ],
 })
