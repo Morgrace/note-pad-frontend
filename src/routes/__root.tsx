@@ -96,18 +96,22 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         <Navbar />
         {children}
         <Toaster />
-        <TanStackDevtools
-          config={{
-            position: 'bottom-left',
-          }}
-          plugins={[
-            {
-              name: 'Tanstack Router',
-              render: <TanStackRouterDevtoolsPanel />,
-            },
-            TanStackQueryDevtools,
-          ]}
-        />
+        {import.meta.env.VITE_ENVIRONMENT === 'development' ? (
+          <TanStackDevtools
+            config={{
+              position: 'bottom-left',
+            }}
+            plugins={[
+              {
+                name: 'Tanstack Router',
+                render: <TanStackRouterDevtoolsPanel />,
+              },
+              TanStackQueryDevtools,
+            ]}
+          />
+        ) : (
+          ''
+        )}
         <Scripts />
       </body>
     </html>
