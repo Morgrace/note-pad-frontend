@@ -12,7 +12,7 @@ function Navbar() {
 
   const handleLogout = async () => {
     await logout()
-    navigate({ to: '/login' })
+    navigate({ to: '/' })
   }
 
   const getInitials = (firstName?: string, lastName?: string) => {

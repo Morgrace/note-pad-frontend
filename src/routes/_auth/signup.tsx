@@ -2,19 +2,26 @@ import { createFileRoute, Link } from '@tanstack/react-router'
 import { useState } from 'react'
 import { Github } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
 import { Card } from '@/components/ui/card'
+import { Input } from '@/components/ui/input'
+import { useAuthStore } from '@/store/auth'
 
 export const Route = createFileRoute('/_auth/signup')({
   component: Signup,
 })
 
 function Signup() {
-  const [error, setError] = useState('')
+  const [errorClient, setErrorClient] = useState('')
+  const [isSigningup, setIsSigningup] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const signup = useAuthStore((state) => state.signup)
+  const errorServer = useAuthStore(state=>state.error);
+  
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    setError('')
+    setErrorClient('')
+    setIsSigningup(true)
 
     const formData = new FormData(e.currentTarget)
     const name = formData.get('name')
@@ -22,13 +29,31 @@ function Signup() {
     const password = formData.get('password')
     const passwordConfirm = formData.get('passwordConfirm')
 
+    // Getting first name and last name from the name input
+    const nameArray = String(name).trim().toLowerCase().split(' ')
+
+    const firstName = nameArray.at(0)
+    const lastName = nameArray.at(1)
+
     if (password !== passwordConfirm) {
-      setError('Passwords do not match')
+      setErrorClient('Passwords do not match')
+      setIsSigningup(false)
       return
     }
-
-    // TODO: Implement signup logic
-    console.log('Signup attempt:', { name, email, password })
+    if (!firstName || !lastName) {
+      setErrorClient('Please provide your full name')
+      setIsSigningup(false)
+      return
+    }
+    await signup(
+      firstName,
+      lastName,
+      String(email),
+      String(password),
+      String(passwordConfirm),
+    )
+    setIsSigningup(false)
+    setErrorClient('')
   }
 
   const handleGoogleSignup = () => {
@@ -55,7 +80,10 @@ function Signup() {
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label htmlFor="name" className="block text-sm font-semibold mb-2 text-slate-700">
+            <label
+              htmlFor="name"
+              className="block text-sm font-semibold mb-2 text-slate-700"
+            >
               Name
             </label>
             <Input
@@ -69,7 +97,10 @@ function Signup() {
           </div>
 
           <div>
-            <label htmlFor="email" className="block text-sm font-semibold mb-2 text-slate-700">
+            <label
+              htmlFor="email"
+              className="block text-sm font-semibold mb-2 text-slate-700"
+            >
               Email
             </label>
             <Input
@@ -118,14 +149,18 @@ function Signup() {
             />
           </div>
 
-          {error && (
+          {errorClient || errorServer?.message && (
             <div className="bg-red-50 border border-red-200 rounded-lg p-3">
-              <p className="text-sm text-red-600 font-medium">{error}</p>
+              <p className="text-sm text-red-600 font-medium">{errorClient || errorServer.message}</p>
             </div>
           )}
 
-          <Button type="submit" className="w-full bg-teal-500 hover:bg-teal-600 shadow-lg hover:shadow-xl transition-all hover:scale-105 text-white font-semibold">
-            Sign Up
+          <Button
+            disabled={isSigningup}
+            type="submit"
+            className="w-full bg-teal-500 hover:bg-teal-600 shadow-lg hover:shadow-xl transition-all hover:scale-105 text-white font-semibold"
+          >
+            {isSigningup ? 'Signing up. . .' : 'Sign Up'}
           </Button>
         </form>
 
@@ -137,6 +172,7 @@ function Signup() {
 
         <div className="space-y-3">
           <Button
+            disabled
             type="button"
             variant="outline"
             className="w-full border border-slate-300 hover:bg-slate-50 hover:border-slate-400 transition-all"
@@ -164,6 +200,7 @@ function Signup() {
           </Button>
 
           <Button
+            disabled
             type="button"
             variant="outline"
             className="w-full border border-slate-300 hover:bg-slate-50 hover:border-slate-400 transition-all"

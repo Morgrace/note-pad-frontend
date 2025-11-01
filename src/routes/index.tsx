@@ -1,6 +1,6 @@
 import { Link, createFileRoute } from '@tanstack/react-router'
-import { Button } from '@/components/ui/button'
 import { StickyNote, Shield, Zap, ArrowRight, Search, Download } from 'lucide-react'
+import { Button } from '@/components/ui/button'
 import { useAuthStore } from '@/store/auth'
 
 export const Route = createFileRoute('/')({
