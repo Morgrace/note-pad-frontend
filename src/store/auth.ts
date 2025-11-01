@@ -34,6 +34,9 @@ export const useAuthStore = create<AuthState>((set) => ({
 
       const response = await api.post(`${BASE_URL}/login`, { email, password })
       const user = response.data.data.user
+      const token = response.data.token
+
+      localStorage.setItem('token', token)
 
       set({ user, isLoading: false })
     } catch (error) {
@@ -55,6 +58,9 @@ export const useAuthStore = create<AuthState>((set) => ({
         passwordConfirm,
       })
       const user = response.data.data.user
+      const token = response.data.token
+
+      localStorage.setItem('token', token)
 
       set({ user, isLoading: false })
     } catch (error) {
@@ -89,10 +95,12 @@ export const useAuthStore = create<AuthState>((set) => ({
     try {
       await api.post(`${BASE_URL}/logout`)
       set({ user: null, error: null })
+      localStorage.removeItem('token')
     } catch (error) {
       const { message, status } = formatAxiosError(error)
       // Still clear user but show error
       set({ user: null, error: { message, status } })
+      localStorage.removeItem('token')
     }
   },
 
