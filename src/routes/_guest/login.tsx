@@ -1,47 +1,34 @@
-import {
-  createFileRoute,
-  Link,
-  useNavigate,
-  useSearch,
-} from '@tanstack/react-router'
-import { toast } from 'sonner'
+import { createFileRoute, Link } from '@tanstack/react-router'
 import { Github } from 'lucide-react'
+import { toast } from 'sonner'
 
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
 import { Card } from '@/components/ui/card'
-import { useAuthStore } from '@/store/auth'
+import { Input } from '@/components/ui/input'
+import { useAuth } from '@/hooks/useAuth'
 
-export const Route = createFileRoute('/_auth/login')({
+export const Route = createFileRoute('/_guest/login')({
   component: Login,
 })
 
 function Login() {
-  const navigate = useNavigate()
-  const search = useSearch({ from: '/_auth/login' })
-
-  const login = useAuthStore((state) => state.login)
-  const isLoading = useAuthStore((state) => state.isLoading)
-  const error = useAuthStore((state) => state.error)
+  const { login, isLoading, error } = useAuth()
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
 
     const formData = new FormData(e.currentTarget)
 
-    const email = formData.get('email')
-    const password = formData.get('password')
+    const email = formData.get('email')?.toString() || ''
+    const password = formData.get('password')?.toString() || ''
 
     try {
-      await login(email as string, password as string)
-
-      const redirectTo = (search as any)?.redirect || '/notes'
-
-      navigate({ to: redirectTo })
-    } catch (error) {
-      console.error('login failed', error)
-
-      toast.error('login failed')
+      const toastId = toast.loading('logging in')
+      await login({ email, password })
+      toast.dismiss(toastId)
+    } catch (error: any) {
+      toast.dismiss()
+      toast.error(error.message || 'login failed')
     }
   }
 
@@ -67,7 +54,7 @@ function Login() {
             </p>
           </div>
 
-          <div className="text-red-600 text-sm">{error?.message || ''}</div>
+          <div className="text-red-600 text-sm">{error || ''}</div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>

@@ -1,12 +1,13 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { notesService } from '@/lib/services/notes.service'
 import type { GetNotes } from '@/types'
-import { deleteNote } from '@/lib/services/notesApi'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { toast } from 'sonner'
 
 export function useDeleteNote() {
   const queryClient = useQueryClient()
 
   const mutation = useMutation({
-    mutationFn: deleteNote,
+    mutationFn: notesService.deleteNote,
     async onMutate(deleteId) {
       // Cancel outgoing refetches
       await queryClient.cancelQueries({ queryKey: ['notes'] })
@@ -44,6 +45,7 @@ export function useDeleteNote() {
         queryClient.setQueryData(['notes'], context.previousNotes)
       }
       console.error(error.message)
+      toast.error('Delete Error')
     },
   })
 

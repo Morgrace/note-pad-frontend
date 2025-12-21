@@ -4,12 +4,12 @@ import {
   useParams,
 } from '@tanstack/react-router'
 
-import { getNote, updateNote } from '@/lib/services/notesApi'
 import NoteEditor from '@/components/note-editor'
+import { notesService } from '@/lib/services/notes.service'
 
 export const Route = createFileRoute('/_authenticated/notes/$id')({
   component: RouteComponent,
-  loader: async ({ params }) => await getNote(params.id),
+  loader: async ({ params }) => await notesService.getNote(params.id),
 })
 
 function RouteComponent() {
@@ -21,7 +21,7 @@ function RouteComponent() {
   return (
     <section>
       <NoteEditor
-        mutationFn={(noteData) => updateNote(id, noteData)}
+        mutationFn={(noteData) => notesService.updateNote(id, noteData)}
         title={noteTitle}
         content={noteContent}
       />

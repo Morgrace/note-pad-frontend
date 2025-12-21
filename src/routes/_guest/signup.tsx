@@ -1,12 +1,13 @@
-import { createFileRoute, Link } from '@tanstack/react-router'
-import { useState } from 'react'
-import { Github } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
-import { useAuthStore } from '@/store/auth'
+import { useAuth } from '@/hooks/useAuth'
+import { createFileRoute, Link } from '@tanstack/react-router'
+import { Github } from 'lucide-react'
+import { useState } from 'react'
+import { toast } from 'sonner'
 
-export const Route = createFileRoute('/_auth/signup')({
+export const Route = createFileRoute('/_guest/signup')({
   component: Signup,
 })
 
@@ -14,8 +15,9 @@ function Signup() {
   const [errorClient, setErrorClient] = useState('')
   const [isSigningup, setIsSigningup] = useState(false)
 
-  const signup = useAuthStore((state) => state.signup)
-  const errorServer = useAuthStore((state) => state.error)
+  const signup = useAuth().signup
+
+  const errorServer = useAuth().error
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -23,13 +25,13 @@ function Signup() {
     setIsSigningup(true)
 
     const formData = new FormData(e.currentTarget)
-    const name = formData.get('name')
-    const email = formData.get('email')
-    const password = formData.get('password')
-    const passwordConfirm = formData.get('passwordConfirm')
+    const fullName = formData.get('fullName')
+    const email = formData.get('email')?.toString() || ''
+    const password = formData.get('password')?.toString() || ''
+    const passwordConfirm = formData.get('passwordConfirm')?.toString() || ''
 
     // Getting first name and last name from the name input
-    const nameArray = String(name).trim().toLowerCase().split(' ')
+    const nameArray = String(fullName).trim().toLowerCase().split(' ')
 
     const firstName = nameArray.at(0)
     const lastName = nameArray.at(1)
@@ -44,15 +46,24 @@ function Signup() {
       setIsSigningup(false)
       return
     }
-    await signup(
-      firstName,
-      lastName,
-      String(email),
-      String(password),
-      String(passwordConfirm),
-    )
-    setIsSigningup(false)
-    setErrorClient('')
+    try {
+      const toastId = toast.loading('Signing up')
+      await signup({
+        firstName,
+        lastName,
+        email,
+        password,
+        passwordConfirm,
+      })
+      setIsSigningup(false)
+      toast.dismiss(toastId)
+      setErrorClient('')
+    } catch (error: any) {
+      setIsSigningup(false)
+      setErrorClient(error.message)
+      toast.dismiss()
+      toast.error(error.message || 'Failed to signup!')
+    }
   }
 
   const handleGoogleSignup = () => {
@@ -81,14 +92,14 @@ function Signup() {
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label
-                htmlFor="name"
+                htmlFor="fullName"
                 className="block text-sm font-semibold mb-2 text-slate-700"
               >
-                Name
+                Full Name
               </label>
               <Input
-                id="name"
-                name="name"
+                id="fullName"
+                name="fullName"
                 type="text"
                 placeholder="John Doe"
                 required
@@ -148,15 +159,15 @@ function Signup() {
                 className="border-slate-300 focus:border-teal-500 focus:ring-teal-500"
               />
             </div>
-
-            {errorClient ||
-              (errorServer?.message && (
-                <div className="bg-red-50 border border-red-200 rounded-lg p-3">
-                  <p className="text-sm text-red-600 font-medium">
-                    {errorClient || errorServer.message}
-                  </p>
-                </div>
-              ))}
+            {errorClient || errorServer ? (
+              <div className="bg-red-50 border border-red-200 rounded-lg p-3">
+                <p className="text-sm text-red-600 font-medium">
+                  {errorClient || errorServer}
+                </p>
+              </div>
+            ) : (
+              ''
+            )}
 
             <Button
               disabled={isSigningup}

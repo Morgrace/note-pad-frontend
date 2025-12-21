@@ -4,8 +4,9 @@ import { Mail, ArrowLeft, Check } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card } from '@/components/ui/card'
+import { authService } from '@/lib/services/auth.service'
 
-export const Route = createFileRoute('/_auth/forgot-password')({
+export const Route = createFileRoute('/_guest/forgot-password')({
   component: ForgotPassword,
 })
 
@@ -13,10 +14,9 @@ function ForgotPassword() {
   const [isSubmitted, setIsSubmitted] = useState(false)
   const [email, setEmail] = useState('')
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    // TODO: Implement forgot password logic
-    console.log('Password reset requested for:', email)
+    await authService.forgotPassword(email)
     setIsSubmitted(true)
   }
 

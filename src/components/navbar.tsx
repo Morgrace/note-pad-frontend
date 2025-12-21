@@ -1,17 +1,16 @@
+import { useAuth } from '@/hooks/useAuth'
 import { Link, useNavigate } from '@tanstack/react-router'
-import { LogOut, User, StickyNote } from 'lucide-react'
+import { LogOut, StickyNote, User } from 'lucide-react'
 import { useState } from 'react'
 import { Button } from './ui/button'
-import { useAuthStore } from '@/store/auth'
 
 function Navbar() {
-  const user = useAuthStore((state) => state.user)
-  const logout = useAuthStore((state) => state.logout)
+  const { user, logout } = useAuth()
   const navigate = useNavigate()
   const [showDropdown, setShowDropdown] = useState(false)
 
   const handleLogout = async () => {
-    await logout()
+    logout()
     navigate({ to: '/' })
   }
 

@@ -1,14 +1,21 @@
-import { Link, createFileRoute } from '@tanstack/react-router'
-import { StickyNote, Shield, Zap, ArrowRight, Search, Download } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { useAuthStore } from '@/store/auth'
+import { useAuth } from '@/hooks/useAuth'
+import { Link, createFileRoute } from '@tanstack/react-router'
+import {
+  ArrowRight,
+  Download,
+  Search,
+  Shield,
+  StickyNote,
+  Zap,
+} from 'lucide-react'
 
 export const Route = createFileRoute('/')({
   component: Home,
 })
 
 function Home() {
-  const user = useAuthStore((state) => state.user)
+  const user = useAuth().user
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
@@ -36,8 +43,8 @@ function Home() {
 
           {/* Tagline */}
           <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-slate-600 max-w-3xl mx-auto font-medium leading-relaxed px-4">
-            A powerful markdown editor designed for professionals.
-            Organize your thoughts, code snippets, and documentation with ease.
+            A powerful markdown editor designed for professionals. Organize your
+            thoughts, code snippets, and documentation with ease.
           </p>
 
           {/* CTA Buttons */}
@@ -83,9 +90,12 @@ function Home() {
               <div className="bg-teal-100 w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-lg flex items-center justify-center mb-4 sm:mb-5 md:mb-6 group-hover:bg-teal-200 transition-colors">
                 <StickyNote className="w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8 text-teal-600" />
               </div>
-              <h3 className="text-lg sm:text-xl md:text-2xl font-bold text-slate-900 mb-2 sm:mb-3">Rich Markdown</h3>
+              <h3 className="text-lg sm:text-xl md:text-2xl font-bold text-slate-900 mb-2 sm:mb-3">
+                Rich Markdown
+              </h3>
               <p className="text-slate-600 text-sm sm:text-base md:text-lg leading-relaxed">
-                Full-featured markdown editor with syntax highlighting, tables, and code blocks.
+                Full-featured markdown editor with syntax highlighting, tables,
+                and code blocks.
               </p>
             </div>
 
@@ -94,9 +104,12 @@ function Home() {
               <div className="bg-blue-100 w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-lg flex items-center justify-center mb-4 sm:mb-5 md:mb-6 group-hover:bg-blue-200 transition-colors">
                 <Shield className="w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8 text-blue-600" />
               </div>
-              <h3 className="text-lg sm:text-xl md:text-2xl font-bold text-slate-900 mb-2 sm:mb-3">Secure & Private</h3>
+              <h3 className="text-lg sm:text-xl md:text-2xl font-bold text-slate-900 mb-2 sm:mb-3">
+                Secure & Private
+              </h3>
               <p className="text-slate-600 text-sm sm:text-base md:text-lg leading-relaxed">
-                Your notes are encrypted and secure. Only you have access to your data.
+                Your notes are encrypted and secure. Only you have access to
+                your data.
               </p>
             </div>
 
@@ -105,9 +118,12 @@ function Home() {
               <div className="bg-amber-100 w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-lg flex items-center justify-center mb-4 sm:mb-5 md:mb-6 group-hover:bg-amber-200 transition-colors">
                 <Zap className="w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8 text-amber-600" />
               </div>
-              <h3 className="text-lg sm:text-xl md:text-2xl font-bold text-slate-900 mb-2 sm:mb-3">Lightning Fast</h3>
+              <h3 className="text-lg sm:text-xl md:text-2xl font-bold text-slate-900 mb-2 sm:mb-3">
+                Lightning Fast
+              </h3>
               <p className="text-slate-600 text-sm sm:text-base md:text-lg leading-relaxed">
-                Instant search, quick filters, and blazing-fast performance. Never wait.
+                Instant search, quick filters, and blazing-fast performance.
+                Never wait.
               </p>
             </div>
           </div>
@@ -124,8 +140,13 @@ function Home() {
                     <Search className="w-4 h-4 sm:w-5 sm:h-5 text-teal-600" />
                   </div>
                   <div>
-                    <h4 className="font-semibold text-sm sm:text-base text-slate-900 mb-1">Powerful Search</h4>
-                    <p className="text-slate-600 text-xs sm:text-sm">Find any note instantly with our advanced search and filtering.</p>
+                    <h4 className="font-semibold text-sm sm:text-base text-slate-900 mb-1">
+                      Powerful Search
+                    </h4>
+                    <p className="text-slate-600 text-xs sm:text-sm">
+                      Find any note instantly with our advanced search and
+                      filtering.
+                    </p>
                   </div>
                 </div>
                 <div className="flex items-start gap-2.5 sm:gap-3">
@@ -133,8 +154,12 @@ function Home() {
                     <Download className="w-4 h-4 sm:w-5 sm:h-5 text-teal-600" />
                   </div>
                   <div>
-                    <h4 className="font-semibold text-sm sm:text-base text-slate-900 mb-1">Export Options</h4>
-                    <p className="text-slate-600 text-xs sm:text-sm">Download your notes in multiple formats for easy sharing.</p>
+                    <h4 className="font-semibold text-sm sm:text-base text-slate-900 mb-1">
+                      Export Options
+                    </h4>
+                    <p className="text-slate-600 text-xs sm:text-sm">
+                      Download your notes in multiple formats for easy sharing.
+                    </p>
                   </div>
                 </div>
                 <div className="flex items-start gap-2.5 sm:gap-3">
@@ -142,8 +167,12 @@ function Home() {
                     <StickyNote className="w-4 h-4 sm:w-5 sm:h-5 text-teal-600" />
                   </div>
                   <div>
-                    <h4 className="font-semibold text-sm sm:text-base text-slate-900 mb-1">Smart Organization</h4>
-                    <p className="text-slate-600 text-xs sm:text-sm">Tag and categorize your notes for perfect organization.</p>
+                    <h4 className="font-semibold text-sm sm:text-base text-slate-900 mb-1">
+                      Smart Organization
+                    </h4>
+                    <p className="text-slate-600 text-xs sm:text-sm">
+                      Tag and categorize your notes for perfect organization.
+                    </p>
                   </div>
                 </div>
                 <div className="flex items-start gap-2.5 sm:gap-3">
@@ -151,8 +180,12 @@ function Home() {
                     <Shield className="w-4 h-4 sm:w-5 sm:h-5 text-teal-600" />
                   </div>
                   <div>
-                    <h4 className="font-semibold text-sm sm:text-base text-slate-900 mb-1">Always Secure</h4>
-                    <p className="text-slate-600 text-xs sm:text-sm">Bank-level encryption keeps your data safe and private.</p>
+                    <h4 className="font-semibold text-sm sm:text-base text-slate-900 mb-1">
+                      Always Secure
+                    </h4>
+                    <p className="text-slate-600 text-xs sm:text-sm">
+                      Bank-level encryption keeps your data safe and private.
+                    </p>
                   </div>
                 </div>
               </div>

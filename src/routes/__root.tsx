@@ -17,8 +17,8 @@ import appCss from '../styles.css?url'
 
 import type { QueryClient } from '@tanstack/react-query'
 
-import { useAuthStore } from '@/store/auth'
 import { SplashScreen } from '@/components/splash-screen'
+import { useAuth } from '@/hooks/useAuth'
 
 interface MyRouterContext {
   queryClient: QueryClient
@@ -62,10 +62,11 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
 
 function RootDocument({ children }: { children: React.ReactNode }) {
   const [showSplashScreen, setShowSplashScreen] = useState(true)
-  const verifyAuth = useAuthStore((state) => state.verifyAuth)
+
+  const checkAuth = useAuth().checkAuth
 
   useEffect(() => {
-    verifyAuth()
+    checkAuth()
   }, [])
 
   useEffect(() => {
