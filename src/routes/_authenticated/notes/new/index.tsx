@@ -1,7 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router'
 
 import NoteEditor from '@/components/note-editor'
-import { createNote } from '@/lib/services/notesApi'
+import { notesService } from '@/lib/services/notes.service'
 
 export const Route = createFileRoute('/_authenticated/notes/new/')({
   component: PageCreateNote,
@@ -10,7 +10,7 @@ export const Route = createFileRoute('/_authenticated/notes/new/')({
 function PageCreateNote() {
   return (
     <section>
-      <NoteEditor mutationFn={createNote} />
+      <NoteEditor mutationFn={notesService.createNote} />
     </section>
   )
 }

@@ -5,15 +5,32 @@ import { twMerge } from 'tailwind-merge'
 export function cn(...inputs: Array<ClassValue>) {
   return twMerge(clsx(inputs))
 }
-export function formatAxiosError(error: unknown) {
-  let status, message
 
-  if (axios.isAxiosError(error)) {
-    status = error.response?.data?.err?.statusCode || 500
-    message = error.response?.data?.errorMessage || error.message
-  } else {
-    message =
-      error instanceof Error ? error.message : 'An unknown error occured'
+export class ApiError extends Error {
+  constructor(
+    message: string,
+    public statusCode?: number,
+    public code?: string,
+  ) {
+    super(message)
+    this.name = 'ApiError'
   }
-  return { message, status }
+}
+
+// Generic error handler
+export function handleApiError(error: unknown): ApiError {
+  if (axios.isAxiosError(error)) {
+    const message =
+      error.response?.data?.message || error.message || 'An error occurred'
+    const statusCode = error.response?.status
+    const code = error.response?.data?.code
+
+    return new ApiError(message, statusCode, code)
+  }
+
+  if (error instanceof ApiError) {
+    return error
+  }
+
+  return new ApiError('An unexpected error occurred')
 }

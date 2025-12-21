@@ -1,40 +1,73 @@
-import { createFileRoute } from '@tanstack/react-router'
-import { useState } from 'react'
-import { Camera, Save, User, Lock, Calendar } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { useAuthStore } from '@/store/auth'
+import { Input } from '@/components/ui/input'
+import { useAuth } from '@/hooks/useAuth'
+import { createFileRoute } from '@tanstack/react-router'
+import { Camera, Lock, Save, User } from 'lucide-react'
+import { useRef, useState } from 'react'
+import { toast } from 'sonner'
 
-export const Route = createFileRoute('/profile')({
-  component: Profile,
+export const Route = createFileRoute('/_authenticated/profile')({
+  component: UserProfile,
 })
 
-function Profile() {
-  const user = useAuthStore((state) => state.user)
-  const [profileImage, setProfileImage] = useState<string | null>(null)
+function UserProfile() {
+  const { user, updateUser, isLoading, updateUserPassword } = useAuth()
+  const [profileImage, setProfileImage] = useState<string | null>(
+    user?.photo || null,
+  )
+  const profileImageToUpload = useRef<File | undefined>(undefined)
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
+    profileImageToUpload.current = file || undefined
     if (file) {
       const reader = new FileReader()
       reader.onloadend = () => {
-        setProfileImage(reader.result as string)
+        const imageData = reader.result as string
+        setProfileImage(imageData)
       }
       reader.readAsDataURL(file)
     }
   }
 
-  const handleUpdateProfile = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleUpdateProfile = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    // TODO: Implement profile update
-    console.log('Update profile')
+    const formData = new FormData(e.currentTarget)
+
+    if (profileImageToUpload) {
+      formData.append('photo', profileImageToUpload.current as Blob)
+    }
+
+    try {
+      const toastId = toast.loading('Updating profile! Please wait...')
+      await updateUser(formData)
+      toast.dismiss(toastId)
+      toast.success('Updated Successfully')
+    } catch (error: any) {
+      toast.dismiss()
+      toast.error(error.message || 'Update failed')
+    }
   }
 
-  const handleUpdatePassword = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleUpdatePassword = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    // TODO: Implement password update
-    console.log('Update password')
+    const formData = new FormData(e.currentTarget)
+
+    const passwordCurrent = formData.get('passwordCurrent')?.toString()
+    const password = formData.get('password')?.toString()
+    const passwordConfirm = formData.get('passwordConfirm')?.toString()
+
+    try {
+      const toastId = toast.loading('Updating Password! Please wait...')
+      if (password !== passwordConfirm) throw new Error('Password mismatch!')
+      await updateUserPassword({ passwordCurrent, password, passwordConfirm })
+      toast.dismiss(toastId)
+      toast.success('Password updated successfully')
+    } catch (error: any) {
+      toast.dismiss()
+      toast.error(error.message || 'Failed to update password')
+    }
   }
 
   const getInitials = () => {
@@ -47,7 +80,9 @@ function Profile() {
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-4xl font-bold text-slate-900">Profile Settings</h1>
+          <h1 className="text-4xl font-bold text-slate-900">
+            Profile Settings
+          </h1>
           <p className="text-slate-600 mt-2 text-lg">
             Manage your account information and preferences
           </p>
@@ -99,10 +134,13 @@ function Profile() {
                   </p>
                   <label htmlFor="profile-upload">
                     <Button
+                      disabled={isLoading}
                       type="button"
                       variant="outline"
                       className="border-slate-300 hover:bg-slate-50"
-                      onClick={() => document.getElementById('profile-upload')?.click()}
+                      onClick={() =>
+                        document.getElementById('profile-upload')?.click()
+                      }
                     >
                       <Camera className="mr-2 h-4 w-4" />
                       Upload Photo
@@ -125,7 +163,10 @@ function Profile() {
               <form onSubmit={handleUpdateProfile} className="space-y-4">
                 <div className="grid md:grid-cols-2 gap-4">
                   <div>
-                    <label htmlFor="firstName" className="block text-sm font-semibold mb-2 text-slate-700">
+                    <label
+                      htmlFor="firstName"
+                      className="block text-sm font-semibold mb-2 text-slate-700"
+                    >
                       First Name
                     </label>
                     <Input
@@ -134,11 +175,15 @@ function Profile() {
                       type="text"
                       defaultValue={user?.firstName}
                       placeholder="John"
+                      required
                       className="border-slate-300 focus:border-teal-500 focus:ring-teal-500"
                     />
                   </div>
                   <div>
-                    <label htmlFor="lastName" className="block text-sm font-semibold mb-2 text-slate-700">
+                    <label
+                      htmlFor="lastName"
+                      className="block text-sm font-semibold mb-2 text-slate-700"
+                    >
                       Last Name
                     </label>
                     <Input
@@ -147,15 +192,21 @@ function Profile() {
                       type="text"
                       defaultValue={user?.lastName}
                       placeholder="Doe"
+                      required
                       className="border-slate-300 focus:border-teal-500 focus:ring-teal-500"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label htmlFor="email" className="block text-sm font-semibold mb-2 text-slate-700">
+                  <label
+                    htmlFor="email"
+                    className="block text-sm font-semibold mb-2 text-slate-700"
+                  >
                     Email Address
-                    <span className="text-slate-500 font-normal ml-2">(Cannot be changed)</span>
+                    <span className="text-slate-500 font-normal ml-2">
+                      (Cannot be changed)
+                    </span>
                   </label>
                   <Input
                     id="email"
@@ -167,8 +218,11 @@ function Profile() {
                   />
                 </div>
 
-                <div>
-                  <label htmlFor="dateOfBirth" className="block text-sm font-semibold mb-2 text-slate-700">
+                {/* <div>
+                  <label
+                    htmlFor="dateOfBirth"
+                    className="block text-sm font-semibold mb-2 text-slate-700"
+                  >
                     <Calendar className="inline h-4 w-4 mr-1" />
                     Date of Birth
                   </label>
@@ -178,10 +232,11 @@ function Profile() {
                     type="date"
                     className="border-slate-300 focus:border-teal-500 focus:ring-teal-500"
                   />
-                </div>
+                </div> */}
 
                 <div className="pt-4">
                   <Button
+                    disabled={isLoading}
                     type="submit"
                     className="bg-teal-500 hover:bg-teal-600 text-white font-semibold shadow-lg hover:shadow-xl transition-all"
                   >
@@ -204,12 +259,15 @@ function Profile() {
             <CardContent>
               <form onSubmit={handleUpdatePassword} className="space-y-4">
                 <div>
-                  <label htmlFor="currentPassword" className="block text-sm font-semibold mb-2 text-slate-700">
+                  <label
+                    htmlFor="passwordCurrent"
+                    className="block text-sm font-semibold mb-2 text-slate-700"
+                  >
                     Current Password
                   </label>
                   <Input
-                    id="currentPassword"
-                    name="currentPassword"
+                    id="passwordCurrent"
+                    name="passwordCurrent"
                     type="password"
                     placeholder="Enter current password"
                     className="border-slate-300 focus:border-teal-500 focus:ring-teal-500"
@@ -217,12 +275,15 @@ function Profile() {
                 </div>
 
                 <div>
-                  <label htmlFor="newPassword" className="block text-sm font-semibold mb-2 text-slate-700">
+                  <label
+                    htmlFor="password"
+                    className="block text-sm font-semibold mb-2 text-slate-700"
+                  >
                     New Password
                   </label>
                   <Input
-                    id="newPassword"
-                    name="newPassword"
+                    id="password"
+                    name="password"
                     type="password"
                     placeholder="Enter new password"
                     minLength={8}
@@ -234,12 +295,15 @@ function Profile() {
                 </div>
 
                 <div>
-                  <label htmlFor="confirmPassword" className="block text-sm font-semibold mb-2 text-slate-700">
+                  <label
+                    htmlFor="passwordConfirm"
+                    className="block text-sm font-semibold mb-2 text-slate-700"
+                  >
                     Confirm New Password
                   </label>
                   <Input
-                    id="confirmPassword"
-                    name="confirmPassword"
+                    id="passwordConfirm"
+                    name="passwordConfirm"
                     type="password"
                     placeholder="Confirm new password"
                     minLength={8}
@@ -249,6 +313,7 @@ function Profile() {
 
                 <div className="pt-4">
                   <Button
+                    disabled={isLoading}
                     type="submit"
                     className="bg-teal-500 hover:bg-teal-600 text-white font-semibold shadow-lg hover:shadow-xl transition-all"
                   >

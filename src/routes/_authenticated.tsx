@@ -1,17 +1,10 @@
-import { createFileRoute, Outlet, redirect } from '@tanstack/react-router'
-import { useAuthStore } from '@/store/auth'
+import { ProtectedRoute } from '@/components/protected-route'
+import { createFileRoute, Outlet } from '@tanstack/react-router'
 
 export const Route = createFileRoute('/_authenticated')({
-  beforeLoad: ({ context, location }) => {
-    const { user } = useAuthStore.getState()
-    if (user === null) {
-      throw redirect({
-        to: '/login',
-        search: {
-          redirect: location.href,
-        },
-      })
-    }
-  },
-  component: () => <Outlet />,
+  component: () => (
+    <ProtectedRoute>
+      <Outlet />,
+    </ProtectedRoute>
+  ),
 })

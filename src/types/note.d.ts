@@ -5,4 +5,4 @@ export interface Note {
   createdAt: Date
   updatedAt: Date
 }
-export type AllNotes = Array<Note>
+export type UserNotes = Array<Note>

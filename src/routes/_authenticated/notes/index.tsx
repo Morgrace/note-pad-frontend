@@ -3,7 +3,7 @@ import { Link, createFileRoute } from '@tanstack/react-router'
 import { Plus, Search, SlidersHorizontal } from 'lucide-react'
 import { useState } from 'react'
 
-import type { AllNotes } from '@/types'
+import type { UserNotes } from '@/types'
 
 import ErrorAllNotes from '@/components/error-all-notes'
 import LoaderAllNotes from '@/components/loader-all-notes'
@@ -11,7 +11,7 @@ import NoteList from '@/components/note-list'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
-import { getNotes } from '@/lib/services/notesApi'
+import { notesService } from '@/lib/services/notes.service'
 
 export const Route = createFileRoute('/_authenticated/notes/')({
   component: PageNotes,
@@ -24,10 +24,10 @@ function PageNotes() {
 
   const { isPending, error, data } = useQuery({
     queryKey: ['notes'],
-    queryFn: getNotes,
+    queryFn: () => notesService.getNotes(),
   })
 
-  const notes: AllNotes = data?.data.notes || []
+  const notes: UserNotes = data?.data.notes || []
 
   // Filter and sort notes
   const filteredNotes = notes
